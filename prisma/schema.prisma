@@ -1,0 +1,54 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Dashboard {
+  id        Int      @id @default(autoincrement())
+  name      String
+  isPublic  Boolean
+  charts    Chart[]
+  filters   Filter[]
+  kpis      Kpi[]
+}
+
+model Chart {
+  id          Int       @id @default(autoincrement())
+  name        String
+  xAxis       String
+  yAxis       String
+  type        String
+  isPublic    Boolean
+  dashboardId Int
+  dashboard   Dashboard @relation(fields: [dashboardId], references: [id])
+  data        Json
+}
+
+model Kpi {
+  id             Int        @id @default(autoincrement())
+  name           String
+  value          Float
+  expressionId   Int
+  expression     Expression @relation(fields: [expressionId], references: [id])
+  dashboardId    Int
+  dashboard      Dashboard  @relation(fields: [dashboardId], references: [id])
+}
+
+model Filter {
+  id          Int       @id @default(autoincrement())
+  name        String
+  query       String
+  dashboardId Int
+  dashboard   Dashboard @relation(fields: [dashboardId], references: [id])
+}
+
+model Expression {
+  id    Int   @id @default(autoincrement())
+  name  String
+  formula String
+  kpis  Kpi[]  // Adicione esta linha para criar a relação oposta
+}
